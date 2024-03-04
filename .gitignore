@@ -1,0 +1,42 @@
+# General
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Snakemake specific
+.snakemake/
+*.snakemake.log
+*.snakemake.log.*
+*.snakemake.profile/
+
+# Conda environments
+envs/
+*.yaml
+
+# Output files (adjust according to your output directories)
+output/
+results/
+data/processed/
+reference/
+fastq_raw/
+
+# Ignore specific data files (you can add specific file types as needed)
+*.fasta
+*.fastq
+*.bam
+*.ibam
+*.sam
+*.vcf
+
+# Compiled Python files
+*.pyc
+__pycache__/
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# OS generated files
+.DS_Store
+Thumbs.db
