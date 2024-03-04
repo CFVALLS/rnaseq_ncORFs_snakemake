@@ -1,0 +1,40 @@
+general:
+  wd: .
+  fastq_folder: "fastq_raw"  # Location of the raw FASTQ files
+  output_dir: "workflow_outputs"  # Main output directory for all results
+
+envs:
+  bowtie: 'env/bowtie2_env.yml'
+  fastqc: 'env/fastqc_env.yml'
+  featurecounts: 'envs/featurecounts_env.yml'
+  salmon: 'envs/salmon_env.yml'
+  star: 'envs/star_env.yml'
+  trimgalore: 'envs/trimgalore_env.yml'
+
+
+fastqc:
+  output_dir: "fastqc_reports"  # Subdirectory for FastQC reports
+
+trimgalore:
+  cores: 6
+  min_length: 100
+  cut_first_n: 10  # Number of nucleotides to cut from the 5' end
+
+bowtie2:
+  index: "path/to/bowtie2/index"  # Path to the Bowtie2 index for contaminant sequences
+  seedlen: 25  # Seed Length (–seedlen) — the number of bases on the high-quality end of the read to which the -n applies. 
+
+star:
+  index: "path/to/star/index"
+  gtf: "path/to/annotation.gtf"
+  mismatches: 2
+  maxmultiplemapping: 10
+
+featureCounts:
+  reference_genome: "path/to/reference_genome.fa"
+  gtf: "path/to/annotation.gtf"
+  strandness: 0
+
+salmon:
+  index_dir: "path/to/salmon_index/MANE_GENCODE_ORFEOME_CDS/"
+
