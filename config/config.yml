@@ -1,40 +1,58 @@
+
+#### Main Pipeline ###
+workflow:
+  # Preprocessing Rules
+  preliminar_fastqc: True
+  trimmgalore: True
+  remove_contaminants: True
+  # Mapping Rules:
+  star_alignment: True
+  featureCounts: True
+  #### Alternative Rules Pipeline ###
+  kraken2: False
+
 general:
   wd: .
-  fastq_folder: "fastq_raw"  # Location of the raw FASTQ files
-  output_dir: "workflow_outputs"  # Main output directory for all results
+  fastq_folder: "/home/cfvall/shared/sequencing_runs/_legacy/_raw/20240201_RNAseq/polysome_data/" 
+  output_dir: "workflow_outputs/"
+  sample_list: "config/samples.txt"
 
 envs:
-  bowtie: 'env/bowtie2_env.yml'
-  fastqc: 'env/fastqc_env.yml'
-  featurecounts: 'envs/featurecounts_env.yml'
-  salmon: 'envs/salmon_env.yml'
-  star: 'envs/star_env.yml'
-  trimgalore: 'envs/trimgalore_env.yml'
-
+  bowtie: '../envs/bowtie2_env.yml'
+  fastqc: '../envs/fastqc_env.yml'
+  featurecounts: '../envs/featurecounts_env.yml'
+  salmon: '../envs/salmon_env.yml'
+  star: '../envs/star_env.yml'
+  trimgalore: '../envs/trimgalore_env.yml'
 
 fastqc:
-  output_dir: "fastqc_reports"  # Subdirectory for FastQC reports
+  output_dir: "fastqc_reports/"
 
 trimgalore:
   cores: 6
   min_length: 100
   cut_first_n: 10  # Number of nucleotides to cut from the 5' end
+  min_quality: 25
 
 bowtie2:
-  index: "path/to/bowtie2/index"  # Path to the Bowtie2 index for contaminant sequences
+  index: "/home/cfvall/shared/xRNA_libs/snotr_RNA/bowtie2/"  # Path to the Bowtie2 index for contaminant sequences
   seedlen: 25  # Seed Length (–seedlen) — the number of bases on the high-quality end of the read to which the -n applies. 
 
 star:
-  index: "path/to/star/index"
-  gtf: "path/to/annotation.gtf"
+  index: "/home/cfvall/shared/assemblies/GRCh38_110/STAR/"
+  gtf: "/home/cfvall/shared/assemblies/GRCh38_110/Homo_sapiens.GRCh38.110.gtf"
   mismatches: 2
   maxmultiplemapping: 10
 
 featureCounts:
-  reference_genome: "path/to/reference_genome.fa"
-  gtf: "path/to/annotation.gtf"
+  reference_genome: "/home/cfvall/shared/assemblies/GRCh38_110/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
+  gtf: "/home/cfvall/shared/assemblies/GRCh38_110/Homo_sapiens.GRCh38.110.gtf"
   strandness: 0
 
 salmon:
-  index_dir: "path/to/salmon_index/MANE_GENCODE_ORFEOME_CDS/"
+  index_dir: "/home/cfvall/shared/salmon_ncORFs_index/"
+  strandness: 'A'
+
+kraken2:
+  db_path: "/home/cfvall/shared/opt/kraken2_db/"
 

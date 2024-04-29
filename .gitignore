@@ -4,6 +4,8 @@
 *.temp
 *.swp
 *.swo
+# Samples
+samples.txt
 
 # Snakemake specific
 .snakemake/
@@ -21,6 +23,8 @@ results/
 data/processed/
 reference/
 fastq_raw/
+fastqc_reports/
+workflow_outputs/
 
 # Ignore specific data files (you can add specific file types as needed)
 *.fasta
