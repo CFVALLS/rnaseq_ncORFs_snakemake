@@ -24,6 +24,7 @@ envs:
   salmon: '../envs/salmon_env.yml'
   star: '../envs/star_env.yml'
   trimgalore: '../envs/trimgalore_env.yml'
+  multiqc: '../envs/multiqc_env.yml'
 
 fastqc:
   output_dir: "fastqc_reports/"
@@ -50,9 +51,12 @@ featureCounts:
   strandness: 0
 
 salmon:
-  index_dir: "/home/cfvall/shared/salmon_ncORFs_index/"
+  index_dir: "/home/cfvall/shared/assemblies/GRCh38_MANE_transcripts/salmon_index_MANE_transcripts/"
   strandness: 'A'
+  transcripts: "/home/cfvall/shared/assemblies/GRCh38_110/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
 
+tximport:
+  tx2gene: 'config/tx2gene.tsv'
 kraken2:
   db_path: "/home/cfvall/shared/opt/kraken2_db/"
 

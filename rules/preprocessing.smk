@@ -12,10 +12,10 @@ rule preliminar_fastqc:
         r1 = config['general']['fastq_folder'] + "{sample}_R1_001.fastq.gz",
         r2 = config['general']['fastq_folder'] + "{sample}_R2_001.fastq.gz"
     output:
-        r1_report = config['fastqc']['output_dir'] + "{sample}_R1_001_fastqc.html",
-        r2_report = config['fastqc']['output_dir'] + "{sample}_R2_001_fastqc.html"
+        r1_report = config['general']['output_dir'] + "fastqc_reports/{sample}_R1_001_fastqc.html",
+        r2_report = config['general']['output_dir'] + "fastqc_reports/{sample}_R2_001_fastqc.html"
     params:
-        outdir = config['fastqc']['output_dir']
+        outdir = config['general']['output_dir'] + "fastqc_reports/"
     log:
         "logs/fastqc/{sample}.log"
     shell:
@@ -66,8 +66,8 @@ rule remove_contaminants:
         trimmed_r1 = config['general']['output_dir'] + "trimmed/{sample}_R1_001_val_1.fq.gz",
         trimmed_r2 = config['general']['output_dir'] + "trimmed/{sample}_R2_001_val_2.fq.gz"
     output:
-        filtered_r1 = config['general']['output_dir'] + "filtered/{sample}_R1_001_filtered.fastq",
-        filtered_r2 = config['general']['output_dir'] + "filtered/{sample}_R2_001_filtered.fastq",
+        filtered_r1 = config['general']['output_dir'] + "filtered/{sample}_R1_001_filtered.fastq.gz",
+        filtered_r2 = config['general']['output_dir'] + "filtered/{sample}_R2_001_filtered.fastq.gz",
         contaminants = config['general']['output_dir'] + "contaminants/{sample}_contaminants.sam"
     params:
         bowtie2_index = config['bowtie2']['index'],
@@ -91,46 +91,22 @@ rule remove_contaminants:
         mv {params.outdir}filtered/{wildcards.sample}.2 {output.filtered_r2} 
         """
 
-# rule quantification_QC:
-#     input:
-#         filtered_r1 = config['general']['output_dir'] + "filtered/{sample}_R1_001_filtered.fastq",
-#         filtered_r2 = config['general']['output_dir'] + "filtered/{sample}_R2_001_filtered.fastq",
-#         contaminants = config['general']['output_dir'] + "contaminants/{sample}_contaminants.sam"
-#     output:
-#         qc_file = config['general']['output_dir'] + "qc/{sample}_qc_report.txt"
-#     params:
-#         outdir = config['general']['output_dir'] + 'qc'
-#     shell:
-#         """
-#         function count_reads() {{
-#             echo $(zcat "$1" | wc -l)
-#         }}
-
-#         function calculate_percentage() {{
-#             echo $(awk "BEGIN {{print(($1 / $2) * 100)}}")
-#         }}
-
-#         mkdir -p {params.outdir}
-
-#         # Count total reads from both R1 and R2
-#         tot_reads_r1=$(count_reads "{input.filtered_r1}")
-#         tot_reads_r2=$(count_reads "{input.filtered_r2}")
-#         tot_reads=$(( (tot_reads_r1 + tot_reads_r2) / 4 ))
-        
-#         # Initialize QC report
-#         echo "Contaminant QC run for {wildcards.sample} on $(date)" > "{output.qc_file}"
-#         echo -e "READ_TYPE\tREADS\tPERCENTAGE" >> "{output.qc_file}"
-#         echo -e "{wildcards.sample}\tTotal\t$tot_reads\t100" >> "{output.qc_file}"
-        
-#         # Quantify contaminants
-#         for contaminant_type in tRNA snRNA snoRNA mtDNA rRNA; do
-#             contaminant_reads=$(samtools view "{input.contaminants}" | grep -c "$contaminant_type")
-#             contaminant_percentage=$(calculate_percentage $contaminant_reads $tot_reads)
-#             echo -e "{wildcards.sample}\t$contaminant_type\t$contaminant_reads\t$contaminant_percentage" >> "{output.qc_file}"
-#         done
-
-#         # Count filtered reads
-#         filtered_reads=$(( ( $(count_reads "{input.filtered_r1}") + $(count_reads "{input.filtered_r2}") ) / 4 ))
-#         filtered_percentage=$(calculate_percentage $filtered_reads $tot_reads)
-#         echo -e "{wildcards.sample}\tPassed\t$filtered_reads\t$filtered_percentage" >> "{output.qc_file}"
-#         """
+rule postfiltering_fastqc:
+    conda:
+        config['envs']['fastqc']
+    input:
+        filtered_r1 = config['general']['output_dir'] + "filtered/{sample}_R1_001_filtered.fastq.gz",
+        filtered_r2 = config['general']['output_dir'] + "filtered/{sample}_R2_001_filtered.fastq.gz"
+    output:
+        filtered_r1_report = config['general']['output_dir'] + "filtered/fastqc/{sample}_R1_001_filtered_fastqc.html",
+        filtered_r2_report = config['general']['output_dir'] + "filtered/fastqc/{sample}_R2_001_filtered_fastqc.html"
+    params:
+        outdir = config['general']['output_dir'] + "filtered/fastqc/"
+    log:
+        "logs/fastqc_postfiltering/{sample}.log"
+    shell:
+        """
+        mkdir -p {params.outdir} && 
+        fastqc {input.filtered_r1} --outdir {params.outdir} > {log} 2>&1 && 
+        fastqc {input.filtered_r2} --outdir {params.outdir} >> {log} 2>&1
+        """
